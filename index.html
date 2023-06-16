@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="nl">
 <head>
     <meta charset="UTF-8">
@@ -5,32 +6,124 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Is het al snackdag?</title>
     <style>
+        html, body {
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+
         body {
             background: #F28A5D;
         }
 
         .container {
             display: flex;
-            flex-direction: row;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100%;
             color: #e8e8e8;
-            font-size: 20vw;
+
             font-family: "Comic Sans MS", sans-serif;
             text-shadow: 0 0 20px rgba(0,0,0,0.2);
+        }
+
+        .container #answer {
+            font-size: 20vw;
+        }
+
+        .container .countdown {
+            text-align: center;
+            display: flex;
+            flex-direction: row;
+            gap: 10px;
         }
     </style>
 </head>
 <body>
 <div class="container">
     <div id="answer">Nee</div>
+    <div class="countdown">
+        <div class="days">
+            <div id="days-countdown"></div>
+            <span></span>
+        </div>
+
+        <div class="hours">
+            <div id="hours-countdown"></div>
+            <span></span>
+        </div>
+
+        <div class="minutes">
+            <div id="minutes-countdown"></div>
+            <span></span>
+        </div>
+
+        <div class="seconds">
+            <div id="seconds-countdown"></div>
+            <span></span>
+        </div>
+    </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/weekOfYear.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/duration.js"></script>
+<script>dayjs.extend(window.dayjs_plugin_weekOfYear)</script>
+<script>dayjs.extend(window.dayjs_plugin_duration)</script>
 <script>
     window.addEventListener('DOMContentLoaded', () => {
+      const answerEl = document.getElementById('answer');
+
+      const dayEl = document.getElementById('days-countdown');
+      const hoursEl = document.getElementById('hours-countdown');
+      const minutesEl = document.getElementById('minutes-countdown');
+      const secondsEl = document.getElementById('seconds-countdown');
+
+      const daysLabelEl = document.querySelector('.days span');
+      const hoursLabelEl = document.querySelector('.hours span');
+      const minutesLabelEl = document.querySelector('.minutes span');
+      const secondsLabelEl = document.querySelector('.seconds span');
+
+      function getRemainingTime() {
+        const currentDate = dayjs();
+
+        let snackDate;
+        if (currentDate.day() < 3) {
+          snackDate = dayjs().day(3);
+        }
+
+        if (currentDate.day() === 3 && currentDate.hour() > 13) {
+          snackDate = dayjs().week(currentDate.week() + 1)
+        }
+
+        if (currentDate.day() > 3) {
+          snackDate = dayjs().week(currentDate.week() + 1).day(3);
+        }
+
+        snackDate = snackDate.hour(11).minute(45).second(0);
+        const diff = snackDate.diff(currentDate);
+        return dayjs.duration(diff);
+      }
+
+      function renderCountDown() {
+        const countdown = getRemainingTime();
+
+        daysLabelEl.innerText = countdown.days() === 1 ? 'Dag' : 'Dagen';
+        hoursLabelEl.innerText = 'Uur';
+        minutesLabelEl.innerText = countdown.minutes() === 1 ? 'Minuut' : 'Minuten';
+        secondsLabelEl.innerText = countdown.seconds() === 1 ? 'Seconde' : 'Seconden';
+
+        dayEl.innerText = countdown.format('DD');
+        hoursEl.innerText = countdown.format('HH');
+        minutesEl.innerText = countdown.format('mm');
+        secondsEl.innerText = countdown.format('ss');
+      }
+      setInterval(renderCountDown, 500);
+      renderCountDown();
+
       if (new Date().getDay() === 3) {
-        document.getElementById('answer').innerText = 'Ja!';
+        answerEl.innerText = 'Ja!';
       }
     });
 </script>
