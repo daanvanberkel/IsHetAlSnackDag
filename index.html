@@ -42,7 +42,7 @@
 </head>
 <body>
 <div class="container">
-    <div id="answer">Nee</div>
+    <div id="answer"></div>
     <div class="countdown">
         <div class="days">
             <div id="days-countdown"></div>
@@ -124,6 +124,8 @@
 
       if (new Date().getDay() === 3) {
         answerEl.innerText = 'Ja!';
+      } else {
+        answerEl.innerText = 'Nee 🥲'
       }
     });
 </script>
